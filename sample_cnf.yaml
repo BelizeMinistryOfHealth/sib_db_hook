@@ -1,5 +1,6 @@
 test:
-  DbUsername: username
-  DbPassword: password
-  DbDatabase: database
-  DbHost: host
+  DbUsername: postgres
+  DbPassword: postgres
+  DbDatabase: postgres
+  DbHost: localhost
+  DbType: postgres
