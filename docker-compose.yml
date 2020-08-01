@@ -1,0 +1,15 @@
+version: "3.7"
+services:
+  postgres:
+    image: postgres:11.6
+    restart: on-failure
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+volumes:
+  postgres:
