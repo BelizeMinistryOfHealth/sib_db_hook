@@ -1,0 +1,5 @@
+test:
+  DbUsername: username
+  DbPassword: password
+  DbDatabase: database
+  DbHost: host
