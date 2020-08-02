@@ -21,7 +21,7 @@ func main() {
 	if len(stage) == 0 {
 		stage = "dev"
 	}
-	cnf, err := ReadConf("sample_cnf.yaml", stage)
+	cnf, err := ReadConf("moh_api_cnf.yaml", stage)
 	if err != nil {
 		log.WithFields(
 			log.Fields{"error": err}).Error("failure reading cnf file")
@@ -36,6 +36,10 @@ func main() {
 	}
 
 	env := NewEnv(db)
+
+	if len(cnf.ApiToken) == 0 {
+		log.Panic("please provide an ApiToken in the yaml file")
+	}
 
 	http.HandleFunc("/api/arrivals",
 		httpsrv.Chain(
