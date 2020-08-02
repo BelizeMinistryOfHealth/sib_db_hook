@@ -192,3 +192,8 @@ func (env *Env) ReadArrivals(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	fmt.Fprintf(w, string(jsonResp))
 }
+
+// HealthCheck returns OK if the server is running
+func HealthCheck(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "OK")
+}
