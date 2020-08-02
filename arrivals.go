@@ -71,3 +71,9 @@ type DbArrival struct {
 	TripId              string `json:"TRIPID"`
 	DateOfBirth         string `json:"DATEOFBIRTH"`
 }
+
+type ArrivalsResponse struct {
+	Arrivals   []Arrival
+	Total      int
+	NextOffset int
+}

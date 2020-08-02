@@ -45,6 +45,7 @@ func main() {
 		httpsrv.Chain(
 			env.ReadArrivals,
 			httpsrv.Method("POST"),
+			httpsrv.EnableCors(),
 			httpsrv.Logging(),
 			httpsrv.VerifyToken(cnf.ApiToken),
 		),
@@ -52,6 +53,7 @@ func main() {
 	http.HandleFunc("/api/check",
 		httpsrv.Chain(
 			httpsrv.HealthCheck,
+			httpsrv.EnableCors(),
 			httpsrv.Method("GET"),
 			httpsrv.Logging(),
 		),

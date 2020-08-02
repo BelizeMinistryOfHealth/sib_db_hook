@@ -55,3 +55,9 @@ type DbScreening struct {
 	Temperature             int    `json:"TEMPERATURE,omitempty"`
 	TripId                  string `json:"TRIPID"`
 }
+
+type ScreeningResponse struct {
+	Screenings []Screening
+	Total      int
+	NextOffset int
+}

@@ -176,14 +176,59 @@ func (env *Env) ReadArrivals(w http.ResponseWriter, r *http.Request) {
 		Cursor:    request.Offset,
 		Limit:     limit,
 	}
-	arrivals, err := env.DB.GetArrivals(queryRequest)
+	arrivalsDb, err := env.DB.GetArrivals(queryRequest)
 	if err != nil {
 		http.Error(w, "error executing query", http.StatusInternalServerError)
 		return
 	}
 
+	var arrivals []sib_db_hook.Arrival
+	for _, arrival := range arrivalsDb.Arrivals {
+		a := sib_db_hook.Arrival{
+			Id:                  arrival.Id,
+			FirstName:           arrival.FirstName,
+			MiddleName:          arrival.MiddleName,
+			LastName:            arrival.LastName,
+			Sex:                 arrival.Sex,
+			PassportNumber:      arrival.PassportNumber,
+			PhoneNumber:         arrival.PhoneNumber,
+			ContactPerson:       arrival.ContactPerson,
+			ContactPersonNumber: arrival.ContactPersonNumber,
+			Nationality:         arrival.Nationality,
+			Residence:           arrival.Residence,
+			PortOfEntry:         arrival.Port,
+			DateEmbarkation:     arrival.DateEmbarkation,
+			CityAirport:         arrival.CityAirport,
+			TravelMode:          arrival.TravelMode,
+			VesselNumber:        arrival.VesselNumber,
+			Province:            arrival.Province,
+			TravelOrigin:        arrival.TravelOrigin,
+			CountryVisited:      arrival.CountryVisited,
+			PurposeOfTrip:       arrival.PurposeOfTrip,
+			LengthOfStay:        arrival.LengthOfStay,
+			FacilityName:        arrival.FacilityName,
+			Facility:            arrival.Facility,
+			FacilityAddress:     arrival.FacilityAddress,
+			FacilityDistrict:    arrival.FacilityDistrict,
+			CountryOfBirth:      arrival.CountryOfBirth,
+			MaritalStatus:       arrival.MaritalStatus,
+			Occupation:          arrival.Occupation,
+			CreatedAt:           arrival.CreatedAt,
+			UpdatedAt:           arrival.UpdatedAt,
+			TripId:              arrival.TripId,
+			DateOfBirth:         arrival.DateOfBirth,
+		}
+		arrivals = append(arrivals, a)
+	}
+
+	resp := sib_db_hook.ArrivalsResponse{
+		Arrivals:   arrivals,
+		Total:      arrivalsDb.Total,
+		NextOffset: arrivalsDb.NextOffset,
+	}
+
 	// Convert arrivals to JSON and send it down in the response
-	jsonResp, err := json.Marshal(arrivals)
+	jsonResp, err := json.Marshal(resp)
 	if err != nil {
 		http.Error(w, "error executing query", http.StatusInternalServerError)
 		return
@@ -191,6 +236,95 @@ func (env *Env) ReadArrivals(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Add("Content-Type", "application/json")
 	fmt.Fprintf(w, string(jsonResp))
+}
+
+func (env *Env) ReadScreenings(w http.ResponseWriter, r *http.Request) {
+	var request ReadArrivalRequest
+	err := Decode(r.Body, &request)
+	if err != nil {
+		log.WithFields(
+			log.Fields{
+				"body": r.Body,
+			}).Error("decoding request body failed")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	if len(strings.Trim(request.Date, "")) == 0 {
+		http.Error(w, "invalid date", http.StatusBadRequest)
+		return
+	}
+
+	if len(strings.Trim(string(request.DateQuery), "")) == 0 {
+		http.Error(w, "invalid dateQuery", http.StatusBadRequest)
+		return
+	}
+
+	var limit = 100
+	if request.Limit > 0 {
+		limit = request.Limit
+	}
+
+	queryRequest := sib_db_hook.ScreeningsQueryRequest{
+		Date:      request.Date,
+		DateQuery: request.DateQuery,
+		Cursor:    request.Offset,
+		Limit:     limit,
+	}
+
+	dbScreenings, err := env.DB.GetScreenings(queryRequest)
+	if err != nil {
+		http.Error(w, "error executing query", http.StatusInternalServerError)
+		return
+	}
+
+	var screenings []sib_db_hook.Screening
+	for _, screening := range dbScreenings.Screenings {
+		s := sib_db_hook.Screening{
+			Id:                      screening.Id,
+			DiagnosedWithCovid:      screening.DiagnosedWithCovid,
+			CovidTest:               screening.CovidTest,
+			ContactedHealthFacility: screening.ContactedHealthFacility,
+			ContactWithCovidCase:    screening.ContactWithCovidCase,
+			SymptomDate:             screening.SymptomDate,
+			Fever:                   screening.Fever,
+			Cough:                   screening.Cough,
+			ShortBreath:             screening.ShortBreath,
+			DifficultyBreathing:     screening.DifficultyBreathing,
+			SoreThroat:              screening.SoreThroat,
+			Headache:                screening.Headache,
+			Malaise:                 screening.Malaise,
+			Diarrhea:                screening.Diarrhea,
+			Vomitting:               screening.Vomitting,
+			Bleeding:                screening.Bleeding,
+			JointPains:              screening.JointPains,
+			EyePain:                 screening.EyePain,
+			GeneralizedRash:         screening.GeneralizedRash,
+			BlurredVision:           screening.BlurredVision,
+			OtherSymptoms:           screening.OtherSymptoms,
+			CreatedAt:               screening.CreatedAt,
+			UpdatedAt:               screening.UpdatedAt,
+			Temperature:             screening.Temperature,
+			TripId:                  screening.TripId,
+		}
+		screenings = append(screenings, s)
+	}
+
+	resp := sib_db_hook.ScreeningResponse{
+		Screenings: screenings,
+		Total:      dbScreenings.Total,
+		NextOffset: dbScreenings.NextOffset,
+	}
+
+	jsonResp, err := json.Marshal(resp)
+	if err != nil {
+		http.Error(w, "error executing query", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	fmt.Fprintf(w, string(jsonResp))
+
 }
 
 // HealthCheck returns OK if the server is running

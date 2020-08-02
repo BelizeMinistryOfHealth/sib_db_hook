@@ -7,7 +7,9 @@ import (
 
 type Datastore interface {
 	GetArrivals(arrivalQueryRequest ArrivalQueryRequest) (*ArrivalQueryResponse, error)
-	CountArrivals(date string, dateQuery DateQuery) (*ArrivalQueryResponse, error)
+	CountArrivals(date string, dateQuery DateQuery) (int, error)
+	CountScreenings(date string, dateQuery DateQuery) (int error)
+	GetScreenings(request ScreeningsQueryRequest) (*ScreeningsQueryResponse, error)
 }
 
 type AppDb struct {
@@ -36,7 +38,20 @@ type ArrivalQueryResponse struct {
 	Total      int
 }
 
+type ScreeningsQueryResponse struct {
+	Screenings []DbScreening
+	NextOffset int
+	Total      int
+}
+
 type ArrivalQueryRequest struct {
+	Date      string
+	DateQuery DateQuery
+	Cursor    int
+	Limit     int
+}
+
+type ScreeningsQueryRequest struct {
 	Date      string
 	DateQuery DateQuery
 	Cursor    int
@@ -45,6 +60,21 @@ type ArrivalQueryRequest struct {
 
 func (db *AppDb) CountArrivals(date string, dateQuery DateQuery) (int, error) {
 	sqlStmt := fmt.Sprintf("SELECT COUNT(ID) FROM TH_ARRIVAL WHERE %s>='%s'", dateQuery, date)
+	var cnt int
+	err := db.QueryRow(sqlStmt).Scan(&cnt)
+	if err != nil {
+		// No rows were found, so cnt is 0
+		if err == sql.ErrNoRows {
+			cnt = 0
+		} else {
+			return cnt, err
+		}
+	}
+	return cnt, err
+}
+
+func (db *AppDb) CountScreenings(date string, dateQuery DateQuery) (int, error) {
+	sqlStmt := fmt.Sprintf("SELECT COUNT(ID) FROM TH_SCREENING WHERE %s>='%s'", dateQuery, date)
 	var cnt int
 	err := db.QueryRow(sqlStmt).Scan(&cnt)
 	if err != nil {
@@ -126,6 +156,73 @@ func (db *AppDb) GetArrivals(arrivalQueryRequest ArrivalQueryRequest) (*ArrivalQ
 	}
 	resp := &ArrivalQueryResponse{
 		Arrivals:   arrivals,
+		NextOffset: nextOffset,
+		Total:      total,
+	}
+	return resp, nil
+}
+
+func (db *AppDb) GetScreenings(request ScreeningsQueryRequest) (*ScreeningsQueryResponse, error) {
+	dateQuery := request.DateQuery
+	date := request.Date
+	limit := request.Limit
+	offset := request.Cursor
+	sqlStmt := fmt.Sprintf("SELECT ID, DIAGNOSECOVID, COVIDTEST, CONTACTHEALTH, CONTACTCOVID, SYMPTOMDATE, FEVER, COUGH, SHORTBREATH, DIFBREATH, SORETHROAT, HEADACHE, MALAISE, DIARRHEA, VOMITTING, BLEEDING, JOINT, EYEPAIN, GENERALIZEDRASH,BLURREDVISION, OTHERSYMP, CREATEDAT, UPDATEDAT, TEMPERATURE, TRIPID  FROM TH_SCREENING WHERE %s>='%s' OFFSET %d LIMIT %d", dateQuery, date, offset, limit)
+	var screenings []DbScreening
+
+	// Count total records that match this query
+	total, err := db.CountScreenings(date, dateQuery)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := db.Query(sqlStmt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var screening DbScreening
+		err = rows.Scan(
+			&screening.Id,
+			&screening.DiagnosedWithCovid,
+			&screening.CovidTest,
+			&screening.ContactedHealthFacility,
+			&screening.ContactWithCovidCase,
+			&screening.SymptomDate,
+			&screening.Fever,
+			&screening.Cough,
+			&screening.ShortBreath,
+			&screening.DifficultyBreathing,
+			&screening.SoreThroat,
+			&screening.Headache,
+			&screening.Malaise,
+			&screening.Diarrhea,
+			&screening.Vomitting,
+			&screening.Bleeding,
+			&screening.JointPains,
+			&screening.EyePain,
+			&screening.GeneralizedRash,
+			&screening.BlurredVision,
+			&screening.OtherSymptoms,
+			&screening.CreatedAt,
+			&screening.UpdatedAt,
+			&screening.Temperature,
+			&screening.TripId)
+		if err != nil {
+			return nil, err
+		}
+
+		screenings = append(screenings, screening)
+	}
+	var nextOffset int
+	if offset+limit < total {
+		nextOffset = offset + limit
+	}
+
+	resp := &ScreeningsQueryResponse{
+		Screenings: screenings,
 		NextOffset: nextOffset,
 		Total:      total,
 	}
