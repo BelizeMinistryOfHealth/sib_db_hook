@@ -16,12 +16,18 @@ func TestGetNewArrivals(t *testing.T) {
 	}
 	defer db.Close()
 
-	arrivals, err := GetArrivals("2020-08-01", CreatedAt, db)
+	arrivalRequest := ArrivalQueryRequest{
+		Date:      "2020-08-01",
+		DateQuery: CreatedAt,
+		Cursor:    0,
+		Limit:     100,
+	}
+	arrivals, err := GetArrivals(arrivalRequest, db)
 	if err != nil {
 		t.Fatalf("failure executing query: %v", err)
 	}
 
-	if len(arrivals) == 0 {
+	if len(arrivals.Arrivals) == 0 {
 		t.Error("want: non empty array, got: empty array")
 	}
 
@@ -38,13 +44,23 @@ func TestGetArrivals_Updated(t *testing.T) {
 	}
 	defer db.Close()
 
-	arrivals, err := GetArrivals("2020-08-01", UpdateAt, db)
+	arrivalRequest := ArrivalQueryRequest{
+		Date:      "2020-08-01",
+		DateQuery: UpdateAt,
+		Cursor:    0,
+		Limit:     100,
+	}
+	arrivals, err := GetArrivals(arrivalRequest, db)
 	if err != nil {
 		t.Fatalf("failure executing query: %v", err)
 	}
 
-	if len(arrivals) == 0 {
+	if len(arrivals.Arrivals) == 0 {
 		t.Error("want: non empty array, got: empty array")
+	}
+
+	if (arrivals.NextOffset) != 0 {
+		t.Error("want: 0 offset, got non-0")
 	}
 
 }
