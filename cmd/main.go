@@ -50,6 +50,17 @@ func main() {
 			httpsrv.VerifyToken(cnf.ApiToken),
 		),
 	)
+
+	http.HandleFunc("/api/screenings",
+		httpsrv.Chain(
+			env.ReadScreenings,
+			httpsrv.Method("POST"),
+			httpsrv.EnableCors(),
+			httpsrv.Logging(),
+			httpsrv.VerifyToken(cnf.ApiToken),
+		),
+	)
+
 	http.HandleFunc("/api/check",
 		httpsrv.Chain(
 			httpsrv.HealthCheck,

@@ -62,5 +62,32 @@ func TestGetArrivals_Updated(t *testing.T) {
 	if (arrivals.NextOffset) != 0 {
 		t.Error("want: 0 offset, got non-0")
 	}
+}
+
+func TestGetNewScreenings(t *testing.T) {
+	cnf, err := ReadConf("sample_cnf.yaml", "test")
+	if err != nil {
+		t.Fatalf("failure reading cnf file %v", err)
+	}
+	db, err := CreateConnection(cnf)
+	if err != nil {
+		t.Fatalf("failure creating connection %v", err)
+	}
+	defer db.Close()
+
+	request := ScreeningsQueryRequest{
+		Date:      "2020-08-01",
+		DateQuery: CreatedAt,
+		Cursor:    0,
+		Limit:     100,
+	}
+	screenings, err := db.GetScreenings(request)
+	if err != nil {
+		t.Fatalf("failure executing query: %v", err)
+	}
+
+	if len(screenings.Screenings) == 0 {
+		t.Error("want: non empty array, got: empty array")
+	}
 
 }

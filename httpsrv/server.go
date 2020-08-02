@@ -280,13 +280,14 @@ func (env *Env) ReadScreenings(w http.ResponseWriter, r *http.Request) {
 
 	var screenings []sib_db_hook.Screening
 	for _, screening := range dbScreenings.Screenings {
+
 		s := sib_db_hook.Screening{
 			Id:                      screening.Id,
 			DiagnosedWithCovid:      screening.DiagnosedWithCovid,
 			CovidTest:               screening.CovidTest,
 			ContactedHealthFacility: screening.ContactedHealthFacility,
 			ContactWithCovidCase:    screening.ContactWithCovidCase,
-			SymptomDate:             screening.SymptomDate,
+			SymptomDate:             screening.SymptomDate.String,
 			Fever:                   screening.Fever,
 			Cough:                   screening.Cough,
 			ShortBreath:             screening.ShortBreath,
@@ -301,10 +302,10 @@ func (env *Env) ReadScreenings(w http.ResponseWriter, r *http.Request) {
 			EyePain:                 screening.EyePain,
 			GeneralizedRash:         screening.GeneralizedRash,
 			BlurredVision:           screening.BlurredVision,
-			OtherSymptoms:           screening.OtherSymptoms,
+			OtherSymptoms:           screening.OtherSymptoms.String,
 			CreatedAt:               screening.CreatedAt,
 			UpdatedAt:               screening.UpdatedAt,
-			Temperature:             screening.Temperature,
+			Temperature:             screening.Temperature.String,
 			TripId:                  screening.TripId,
 		}
 		screenings = append(screenings, s)

@@ -1,5 +1,7 @@
 package sib_db_hook
 
+import "database/sql"
+
 type Screening struct {
 	Id                      string `json:"id"`
 	DiagnosedWithCovid      bool   `json:"diagnosedWithCovid"`
@@ -24,36 +26,36 @@ type Screening struct {
 	OtherSymptoms           string `json:"otherSymptoms,omitempty"`
 	CreatedAt               string `json:"createdAt"`
 	UpdatedAt               string `json:"updatedAt"`
-	Temperature             int    `json:"temperature"`
+	Temperature             string `json:"temperature"`
 	TripId                  string `json:"tripId"`
 }
 
 type DbScreening struct {
-	Id                      string `json:"ID"`
-	DiagnosedWithCovid      bool   `json:"DIAGNOSECOVID"`
-	CovidTest               bool   `json:"COVIDTEST"`
-	ContactedHealthFacility bool   `json:"CONTACTHEALTH"`
-	ContactWithCovidCase    bool   `json:"CONTACTCOVID"`
-	SymptomDate             string `json:"SYMPTOMDATE,omitempty"`
-	Fever                   bool   `json:"FEVER"`
-	Cough                   bool   `json:"COUGH"`
-	ShortBreath             bool   `json:"SHORTBREATH"`
-	DifficultyBreathing     bool   `json:"DIFBREATH"`
-	SoreThroat              bool   `json:"SORETHROAT"`
-	Headache                bool   `json:"HEADACHE"`
-	Malaise                 bool   `json:"MALAISE"`
-	Diarrhea                bool   `json:"DIARRHEA"`
-	Vomitting               bool   `json:"VOMITTING"`
-	Bleeding                bool   `json:"BLEEDING"`
-	JointPains              bool   `json:"JOINT"`
-	EyePain                 bool   `json:"EYEPAIN"`
-	GeneralizedRash         bool   `json:"GENERALIZEDRASH"`
-	BlurredVision           bool   `json:"BLURREDVISION"`
-	OtherSymptoms           string `json:"OTHERSYMP,omitempty"`
-	CreatedAt               string `json:"CREATEDAT"`
-	UpdatedAt               string `json:"UPDATEDAT"`
-	Temperature             int    `json:"TEMPERATURE,omitempty"`
-	TripId                  string `json:"TRIPID"`
+	Id                      string         `json:"ID"`
+	DiagnosedWithCovid      bool           `json:"DIAGNOSECOVID"`
+	CovidTest               bool           `json:"COVIDTEST"`
+	ContactedHealthFacility bool           `json:"CONTACTHEALTH"`
+	ContactWithCovidCase    bool           `json:"CONTACTCOVID"`
+	SymptomDate             sql.NullString `json:"SYMPTOMDATE"`
+	Fever                   bool           `json:"FEVER"`
+	Cough                   bool           `json:"COUGH"`
+	ShortBreath             bool           `json:"SHORTBREATH"`
+	DifficultyBreathing     bool           `json:"DIFBREATH"`
+	SoreThroat              bool           `json:"SORETHROAT"`
+	Headache                bool           `json:"HEADACHE"`
+	Malaise                 bool           `json:"MALAISE"`
+	Diarrhea                bool           `json:"DIARRHEA"`
+	Vomitting               bool           `json:"VOMITTING"`
+	Bleeding                bool           `json:"BLEEDING"`
+	JointPains              bool           `json:"JOINT"`
+	EyePain                 bool           `json:"EYEPAIN"`
+	GeneralizedRash         bool           `json:"GENERALIZEDRASH"`
+	BlurredVision           bool           `json:"BLURREDVISION"`
+	OtherSymptoms           sql.NullString `json:"OTHERSYMP,omitempty"`
+	CreatedAt               string         `json:"CREATEDAT"`
+	UpdatedAt               string         `json:"UPDATEDAT"`
+	Temperature             sql.NullString `json:"TEMPERATURE,omitempty"`
+	TripId                  string         `json:"TRIPID"`
 }
 
 type ScreeningResponse struct {
