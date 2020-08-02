@@ -5,10 +5,22 @@ import (
 	"fmt"
 )
 
-func CreateConnection(cnf *dbConf) (*sql.DB, error) {
+type Datastore interface {
+	GetArrivals(arrivalQueryRequest ArrivalQueryRequest) (*ArrivalQueryResponse, error)
+	CountArrivals(date string, dateQuery DateQuery) (*ArrivalQueryResponse, error)
+}
+
+type AppDb struct {
+	*sql.DB
+}
+
+func CreateConnection(cnf *dbConf) (*AppDb, error) {
 	connstr := fmt.Sprintf("user=%s dbname=%s password=%s host=%s sslmode=disable", cnf.DbUsername, cnf.DbDatabase, cnf.DbPassword, cnf.DbHost)
 	db, err := sql.Open(cnf.DbType, connstr)
-	return db, err
+	if err != nil {
+		return nil, err
+	}
+	return &AppDb{db}, err
 }
 
 type DateQuery string
@@ -31,7 +43,7 @@ type ArrivalQueryRequest struct {
 	Limit     int
 }
 
-func countArrivals(date string, dateQuery DateQuery, db *sql.DB) (int, error) {
+func (db *AppDb) CountArrivals(date string, dateQuery DateQuery) (int, error) {
 	sqlStmt := fmt.Sprintf("SELECT COUNT(ID) FROM TH_ARRIVAL WHERE %s>='%s'", dateQuery, date)
 	var cnt int
 	err := db.QueryRow(sqlStmt).Scan(&cnt)
@@ -46,7 +58,7 @@ func countArrivals(date string, dateQuery DateQuery, db *sql.DB) (int, error) {
 	return cnt, err
 }
 
-func GetArrivals(arrivalQueryRequest ArrivalQueryRequest, db *sql.DB) (*ArrivalQueryResponse, error) {
+func (db *AppDb) GetArrivals(arrivalQueryRequest ArrivalQueryRequest) (*ArrivalQueryResponse, error) {
 	dateQuery := arrivalQueryRequest.DateQuery
 	date := arrivalQueryRequest.Date
 	limit := arrivalQueryRequest.Limit
@@ -55,7 +67,7 @@ func GetArrivals(arrivalQueryRequest ArrivalQueryRequest, db *sql.DB) (*ArrivalQ
 	var arrivals []DbArrival
 
 	// Count total records that match this query
-	total, err := countArrivals(date, dateQuery, db)
+	total, err := db.CountArrivals(date, dateQuery)
 	if err != nil {
 		return nil, err
 	}

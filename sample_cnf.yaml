@@ -4,3 +4,12 @@ test:
   DbDatabase: postgres
   DbHost: localhost
   DbType: postgres
+  ApiToken: "token"
+
+dev:
+  DbUsername: postgres
+  DbPassword: postgres
+  DbDatabase: postgres
+  DbHost: localhost
+  DbType: postgres
+  ApiToken: "token"

@@ -22,7 +22,7 @@ func TestGetNewArrivals(t *testing.T) {
 		Cursor:    0,
 		Limit:     100,
 	}
-	arrivals, err := GetArrivals(arrivalRequest, db)
+	arrivals, err := db.GetArrivals(arrivalRequest)
 	if err != nil {
 		t.Fatalf("failure executing query: %v", err)
 	}
@@ -50,7 +50,7 @@ func TestGetArrivals_Updated(t *testing.T) {
 		Cursor:    0,
 		Limit:     100,
 	}
-	arrivals, err := GetArrivals(arrivalRequest, db)
+	arrivals, err := db.GetArrivals(arrivalRequest)
 	if err != nil {
 		t.Fatalf("failure executing query: %v", err)
 	}

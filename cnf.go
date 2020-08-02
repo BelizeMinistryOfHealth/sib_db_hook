@@ -9,6 +9,7 @@ type dbConf struct {
 	DbDatabase string
 	DbHost     string
 	DbType     string
+	ApiToken   string
 }
 
 // ReadConf reads a yaml file and unmarshalls its content.
