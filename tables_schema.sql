@@ -36,3 +36,33 @@ create table if not exists th_arrival
 
 alter table th_arrival owner to postgres;
 
+create table if not exists th_screening
+(
+    id varchar,
+    diagnosecovid varchar,
+    covidtest varchar,
+    contactcovid varchar,
+    contacthealth varchar,
+    symptomdate varchar,
+    fever varchar,
+    cough varchar,
+    shortbreath varchar,
+    difbreath varchar,
+    sorethroat varchar,
+    headache varchar,
+    malaise varchar,
+    diarrhea varchar,
+    vomitting varchar,
+    bleeding varchar,
+    joint varchar,
+    eyepain varchar,
+    generalizedrash varchar,
+    blurredvision varchar,
+    othersymp varchar,
+    createdat timestamp,
+    updatedat timestamp,
+    tripid varchar,
+    temperature varchar
+);
+
+alter table th_screening owner to postgres;
