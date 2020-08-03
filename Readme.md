@@ -30,8 +30,9 @@ To compile for MacOS:
 make buildMacos
 ```
 
-Compilation will produce a binary under `./bin` called `moh_api_server`. To start the server type `./bin/moh_api_server`
-on the command line. The server will then be available at `http://localhost:3000`.
+Compilation will produce a binary under `./bin` called `moh_api_server`. To start the server export `MOH_API_STAGE`:
+`export MOH_API_STAGE=prod`, then type `./bin/moh_api_server` on the command line. The server will then be available 
+at `http://localhost:3000`.
 
 ## Add Database credentials
 The server makes use of a configuration file called `moh_api_cnf.yaml` which should be placed under the same directory
