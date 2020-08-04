@@ -13,3 +13,11 @@ dev:
   DbHost: localhost
   DbType: postgres
   ApiToken: "token"
+
+prod:
+  DbUsername: postgres
+  DbPassword: postgres
+  DbDatabase: postgres
+  DbHost: localhost
+  DbType: postgres
+  ApiToken: "token"
